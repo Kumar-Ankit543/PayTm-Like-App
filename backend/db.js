@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 mongoose.connect(
-  "mongodb+srv://kumarankit7613:kankit7613cluster0.wxppf0z.mongodb.net/PayTm"
+  "mongodb+srv://kumarankit7613:kankit7613@cluster0.wxppf0z.mongodb.net/PayTm"
 );
 
 const userSchema = new mongoose.Schema({
@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
     trim: true,
     lowercase: true,
-    minLenght: 3,
+    minLength: 3,
     maxLength: 30,
   },
   password: {
@@ -35,6 +35,6 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
-module.exports({
+module.exports = {
   User: User,
-});
+};
