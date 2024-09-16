@@ -16,49 +16,55 @@ accountRouter.get("/balance", authMiddleware, async (req, res) => {
 });
 
 accountRouter.post("/transfer", authMiddleware, async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
+  try {
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-  //const { amount, to } = req.body;
-  const { amount, toEmail } = req.body;
+    const { amount, toEmail } = req.body;
 
-  const account = await Account.findOne({ userID: req.userID }).session(
-    session
-  );
+    const account = await Account.findOne({ userID: req.userID }).session(
+      session
+    );
 
-  if (!account || account.balance < amount) {
-    await session.abortTransaction();
-    return res.status(400).json({
-      msg: "Insufficient balance",
+    if (!account || account.balance < amount) {
+      await session.abortTransaction();
+      return res.status(400).json({
+        msg: "Insufficient balance",
+      });
+    }
+
+    const receiver = await User.findOne({ username: toEmail }).session(session);
+    const toAccount = await Account.findOne({ userID: receiver._id }).session(
+      session
+    );
+
+    if (!toAccount) {
+      await session.abortTransaction();
+      return res.status(404).json({
+        msg: "Invalid account",
+      });
+    }
+
+    await Account.updateOne(
+      { userID: req.userID },
+      { $inc: { balance: -amount } }
+    ).session(session);
+    await Account.updateOne(
+      { userID: receiver._id },
+      { $inc: { balance: amount } }
+    ).session(session);
+
+    await session.commitTransaction();
+
+    res.status(200).json({
+      msg: "Transaction successful",
     });
-  }
-
-  const receiver = await User.findOne({ username: toEmail }).session(session);
-  const toAccount = await Account.findOne({ userID: receiver._id }).session(
-    session
-  );
-
-  if (!toAccount) {
+  } catch (error) {
     await session.abortTransaction();
     return res.status(404).json({
-      msg: "Invalid account",
+      msg: "Something went wrong",
     });
   }
-
-  await Account.updateOne(
-    { userID: req.userID },
-    { $inc: { balance: -amount } }
-  ).session(session);
-  await Account.updateOne(
-    { userID: receiver._id },
-    { $inc: { balance: amount } }
-  ).session(session);
-
-  await session.commitTransaction();
-
-  res.status(200).json({
-    msg: "Transaction successful",
-  });
 });
 
 module.exports = accountRouter;
