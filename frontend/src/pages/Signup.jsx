@@ -3,8 +3,14 @@ import { Buttonx } from "../components/Buttonx";
 import { Heading } from "../components/Heading";
 import { InputBox } from "../components/InputBox";
 import { SubHeading } from "../components/SubHeading";
+import { useState } from "react";
+import axios from "axios";
 
 export function Signup() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   return (
     <div>
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-purple-200">
@@ -13,14 +19,45 @@ export function Signup() {
           <SubHeading
             label={"Enter your information to create an account"}
           ></SubHeading>
-          <InputBox input={"First Name"} placeholder={"John"}></InputBox>
-          <InputBox input={"Last Name"} placeholder={"Doe"}></InputBox>
           <InputBox
+            onChange={(e) => {
+              setFirstName(e.target.value);
+            }}
+            input={"First Name"}
+            placeholder={"John"}
+          ></InputBox>
+          <InputBox
+            onChange={(e) => {
+              setLastName(e.target.value);
+            }}
+            input={"Last Name"}
+            placeholder={"Doe"}
+          ></InputBox>
+          <InputBox
+            onChange={(e) => {
+              setUsername(e.target.value);
+            }}
             input={"Email"}
             placeholder={"johndoe@gmail.com"}
           ></InputBox>
-          <InputBox input={"Password"} placeholder={"12345"}></InputBox>
-          <Buttonx label={"Sign Up"}></Buttonx>
+          <InputBox
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+            input={"Password"}
+            placeholder={"12345"}
+          ></InputBox>
+          <Buttonx
+            onClick={() => {
+              axios.post("http://localhost:3000/api/v1/user/signup", {
+                firstName: firstName,
+                lastName: lastName,
+                username: username,
+                password: password,
+              });
+            }}
+            label={"Sign Up"}
+          ></Buttonx>
           <BottomWarning
             label={"Already have an account?"}
             buttonText={"Sign in"}
