@@ -5,8 +5,10 @@ import { InputBox } from "../components/InputBox";
 import { SubHeading } from "../components/SubHeading";
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export function Signup() {
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
@@ -59,6 +61,7 @@ export function Signup() {
                 }
               );
               localStorage.setItem("token", response.data.token);
+              navigate("/dashboard");
             }}
             label={"Sign Up"}
           ></Buttonx>
