@@ -128,7 +128,7 @@ userRouter.put("/", authMiddleware, async (req, res) => {
   });
 });
 
-userRouter.get("/bulk", async (req, res) => {
+userRouter.get("/bulk", authMiddleware, async (req, res) => {
   const filter = req.query.filter || "";
   const users = await User.find({
     $or: [{ firstName: { $regex: filter } }, { lastName: { $regex: filter } }],

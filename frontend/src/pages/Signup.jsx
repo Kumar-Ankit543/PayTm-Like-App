@@ -48,13 +48,17 @@ export function Signup() {
             placeholder={"12345"}
           ></InputBox>
           <Buttonx
-            onClick={() => {
-              axios.post("http://localhost:3000/api/v1/user/signup", {
-                firstName: firstName,
-                lastName: lastName,
-                username: username,
-                password: password,
-              });
+            onClick={async () => {
+              const response = await axios.post(
+                "http://localhost:3000/api/v1/user/signup",
+                {
+                  firstName: firstName,
+                  lastName: lastName,
+                  username: username,
+                  password: password,
+                }
+              );
+              localStorage.setItem("token", response.data.token);
             }}
             label={"Sign Up"}
           ></Buttonx>

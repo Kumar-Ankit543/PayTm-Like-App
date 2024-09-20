@@ -1,29 +1,31 @@
 import { useNavigate } from "react-router-dom";
 import { Buttonx } from "./Buttonx";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export const Users = () => {
-  const users = [
-    {
-      firstName: "Ankit",
-      lastName: "Kumar",
-      _id: "12",
-    },
-    {
-      firstName: "Ankit",
-      lastName: "Kumar",
-      _id: "12",
-    },
-    {
-      firstName: "Ankit",
-      lastName: "Kumar",
-      _id: "12",
-    },
-  ];
+  const token = localStorage.getItem("token");
+  const [users, setUsers] = useState([]);
+  const [filter, setFilter] = useState("");
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/v1/user/bulk?filter=" + filter, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => setUsers(response.data.user));
+  }, [filter]);
+
   return (
     <>
       <div className="font-bold mt-6 text-lg">Users</div>
       <div className="my-2">
         <input
+          onChange={(e) => {
+            setFilter(e.target.value);
+          }}
           type="text"
           placeholder="Search users..."
           className="w-full px-2 py-1 border rounded border-slate-200"
@@ -57,7 +59,7 @@ function User({ user }) {
 
       <div className="flex flex-col justify-center h-ful">
         <Buttonx
-          onClick={(e) => {
+          onClick={() => {
             navigate("/send?id=" + user._id + "&name=" + user.firstName);
           }}
           label={"Send Money"}

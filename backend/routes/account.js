@@ -16,11 +16,11 @@ accountRouter.get("/balance", authMiddleware, async (req, res) => {
 });
 
 accountRouter.post("/transfer", authMiddleware, async (req, res) => {
+  const session = await mongoose.startSession();
   try {
-    const session = await mongoose.startSession();
     session.startTransaction();
 
-    const { amount, toEmail } = req.body;
+    const { amount, toID } = req.body;
 
     const account = await Account.findOne({ userID: req.userID }).session(
       session
@@ -33,10 +33,7 @@ accountRouter.post("/transfer", authMiddleware, async (req, res) => {
       });
     }
 
-    const receiver = await User.findOne({ username: toEmail }).session(session);
-    const toAccount = await Account.findOne({ userID: receiver._id }).session(
-      session
-    );
+    const toAccount = await Account.findOne({ userID: toID }).session(session);
 
     if (!toAccount) {
       await session.abortTransaction();
@@ -50,7 +47,7 @@ accountRouter.post("/transfer", authMiddleware, async (req, res) => {
       { $inc: { balance: -amount } }
     ).session(session);
     await Account.updateOne(
-      { userID: receiver._id },
+      { userID: toID },
       { $inc: { balance: amount } }
     ).session(session);
 
